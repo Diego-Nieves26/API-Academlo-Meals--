@@ -26,7 +26,6 @@ const getAllActiveMeals = catchAsync(async (req, res, next) => {
     where: { status: "active" },
     include: Restaurant,
   });
-  console.log(meals);
 
   res.status(200).json({
     status: "success",
