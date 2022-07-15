@@ -18,4 +18,16 @@ const orderExists = catchAsync(async (req, res, next) => {
   next();
 });
 
-module.exports = { orderExists };
+const verifyOrder = catchAsync(async (req, res, next) => {
+  const { sessionUser } = req;
+  const { order } = req;
+
+  if (sessionUser.id !== order.userId) {
+    return next(new AppError("This is not your order", 404));
+  }
+
+  req.order = order;
+  next();
+});
+
+module.exports = { orderExists, verifyOrder };

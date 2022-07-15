@@ -12,7 +12,10 @@ const {
 const {
   createOrderValidator,
 } = require("../middlewares/validators.middleware");
-const { orderExists } = require("../middlewares/orders.middleware");
+const {
+  orderExists,
+  verifyOrder,
+} = require("../middlewares/orders.middleware");
 const { protectSession } = require("../middlewares/auth.middleware");
 
 const ordersRouter = express.Router();
@@ -23,8 +26,8 @@ ordersRouter.post("/", createOrderValidator, createOrder);
 
 ordersRouter.get("/me", getAllOrders);
 
-ordersRouter.patch("/:id", orderExists, completedOrder);
+ordersRouter.patch("/:id", orderExists, verifyOrder, completedOrder);
 
-ordersRouter.delete("/:id", orderExists, cancelOrder);
+ordersRouter.delete("/:id", orderExists, verifyOrder, cancelOrder);
 
 module.exports = { ordersRouter };

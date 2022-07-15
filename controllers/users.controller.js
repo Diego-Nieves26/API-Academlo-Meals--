@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 const { User } = require("../models/user.model");
 const { Order } = require("../models/order.model");
 const { Restaurant } = require("../models/restaurant.model");
+const { Meal } = require("../models/meal.model");
 
 // Utils
 const { catchAsync } = require("../utils/catchAsync.util");
@@ -14,7 +15,7 @@ const { AppError } = require("../utils/appError.util");
 dotenv.config({ path: "./config.env" });
 
 const createUser = catchAsync(async (req, res, next) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, role } = req.body;
 
   const salt = await bcrypt.genSalt(12);
   const hashPassword = await bcrypt.hash(password, salt);
@@ -23,6 +24,7 @@ const createUser = catchAsync(async (req, res, next) => {
     name: username,
     email,
     password: hashPassword,
+    role,
   });
 
   newUser.password = undefined;
@@ -75,12 +77,12 @@ const deleteUser = catchAsync(async (req, res, next) => {
   res.status(204).json({ status: "success" });
 });
 
-//Pending
 const getAllOrders = catchAsync(async (req, res, next) => {
   const { sessionUser } = req;
-  console.log(sessionUser.id);
+
   const orders = await Order.findAll({
     where: { userId: sessionUser.id },
+    include: [{ model: Meal, include: { model: Restaurant } }],
   });
 
   res.status(200).json({
@@ -90,11 +92,17 @@ const getAllOrders = catchAsync(async (req, res, next) => {
 });
 
 const getOrderById = catchAsync(async (req, res, next) => {
+  const { sessionUser } = req;
   const { id } = req.params;
 
   const order = await Order.findOne({
-    where: { id },
+    where: { id, userId: sessionUser.id },
+    include: [{ model: Meal, include: { model: Restaurant } }],
   });
+
+  if (!order) {
+    return next(new AppError("Order not found", 404));
+  }
 
   res.status(200).json({
     status: "success",

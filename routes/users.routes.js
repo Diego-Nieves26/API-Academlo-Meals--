@@ -13,6 +13,7 @@ const {
 // Middlewares
 const { createUserValidator } = require("../middlewares/validators.middleware");
 const { userExists } = require("../middlewares/users.middleware");
+const { orderExists } = require("../middlewares/orders.middleware");
 const {
   protectSession,
   protectUserAcoount,

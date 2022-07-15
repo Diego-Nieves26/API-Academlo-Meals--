@@ -1,6 +1,7 @@
 // Models
 const { Meal } = require("../models/meal.model");
 const { Order } = require("../models/order.model");
+const { Restaurant } = require("../models/restaurant.model");
 
 // Utils
 const { catchAsync } = require("../utils/catchAsync.util");
@@ -32,6 +33,12 @@ const getAllOrders = catchAsync(async (req, res, next) => {
   const { sessionUser } = req;
   const orders = await Order.findAll({
     where: { userId: sessionUser.id },
+    include: [
+      {
+        model: Meal,
+        include: { model: Restaurant },
+      },
+    ],
   });
 
   res.status(200).json({

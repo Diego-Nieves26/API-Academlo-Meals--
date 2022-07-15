@@ -18,11 +18,11 @@ db.authenticate()
 Restaurant.hasMany(Review, { foreignKey: "restaurantId" });
 Review.belongsTo(Restaurant);
 
+Restaurant.hasMany(Meal, { foreignKey: "restaurantId" });
+Meal.belongsTo(Restaurant);
+
 User.hasMany(Review, { foreignKey: "userId" });
 Review.belongsTo(User);
-
-Restaurant.hasMany(Meal, { foreignKey: "restaurantId" });
-Review.belongsTo(Restaurant);
 
 User.hasMany(Order, { foreignKey: "userId" });
 Order.belongsTo(User);

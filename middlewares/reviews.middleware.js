@@ -23,7 +23,7 @@ const reviewUser = catchAsync(async (req, res, next) => {
   const { sessionUser } = req;
 
   if (review.userId !== sessionUser.id) {
-    return next(new AppError("You do not own this account", 404));
+    return next(new AppError("You do not own this comment", 404));
   }
 
   next();

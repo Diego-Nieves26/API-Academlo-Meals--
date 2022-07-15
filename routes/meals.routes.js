@@ -3,7 +3,7 @@ const express = require("express");
 // Controllers
 const {
   createMeal,
-  getAllActiceMeals,
+  getAllActiveMeals,
   getMealById,
   updateMeal,
   disableMeal,
@@ -13,11 +13,12 @@ const {
 const { createMealValidator } = require("../middlewares/validators.middleware");
 const { mealExists } = require("../middlewares/meals.middleware");
 const { restaurantExists } = require("../middlewares/restaurants.middleware");
+const { isAdmin } = require("../middlewares/users.middleware");
 const { protectSession } = require("../middlewares/auth.middleware");
 
 const mealsRouter = express.Router();
 
-mealsRouter.get("/", getAllActiceMeals);
+mealsRouter.get("/", getAllActiveMeals);
 
 mealsRouter.get("/:id", mealExists, getMealById);
 
@@ -25,8 +26,8 @@ mealsRouter.use(protectSession);
 
 mealsRouter.post("/:id", createMealValidator, restaurantExists, createMeal);
 
-mealsRouter.patch("/:id", mealExists, updateMeal);
+mealsRouter.patch("/:id", isAdmin, mealExists, updateMeal);
 
-mealsRouter.delete("/:id", mealExists, disableMeal);
+mealsRouter.delete("/:id", isAdmin, mealExists, disableMeal);
 
 module.exports = { mealsRouter };

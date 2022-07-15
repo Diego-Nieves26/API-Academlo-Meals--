@@ -29,7 +29,6 @@ const protectSession = catchAsync(async (req, res, next) => {
   const user = await User.findOne({
     where: { id: decoded.id, status: "active" },
   });
-
   if (!user) {
     return next(
       new AppError("The owner of this token doesnt exist anymore", 403)

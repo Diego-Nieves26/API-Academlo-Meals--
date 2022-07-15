@@ -21,6 +21,7 @@ const {
   reviewExists,
   reviewUser,
 } = require("../middlewares/reviews.middleware");
+const { isAdmin } = require("../middlewares/users.middleware");
 const { protectSession } = require("../middlewares/auth.middleware");
 
 const restaurantsRouter = express.Router();
@@ -33,9 +34,9 @@ restaurantsRouter.use(protectSession);
 
 restaurantsRouter.post("/", createRestaurantValidator, createRestaurant);
 
-restaurantsRouter.patch("/:id", restaurantExists, updateRestaurant);
+restaurantsRouter.patch("/:id", isAdmin, restaurantExists, updateRestaurant);
 
-restaurantsRouter.delete("/:id", restaurantExists, disableRestaurant);
+restaurantsRouter.delete("/:id", isAdmin, restaurantExists, disableRestaurant);
 
 restaurantsRouter.post("/reviews/:restaurantId", createReview);
 

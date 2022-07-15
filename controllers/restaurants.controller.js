@@ -84,13 +84,12 @@ const updateReview = catchAsync(async (req, res, next) => {
 });
 
 const disableReview = catchAsync(async (req, res, next) => {
-  const { gameId, consoleId } = req.body;
+  const { review } = req;
 
-  const gameInConsole = await GamesInConsole.create({ gameId, consoleId });
+  await review.update({ status: "deleted" });
 
-  res.status(201).json({
+  res.status(204).json({
     status: "success",
-    gameInConsole,
   });
 });
 
