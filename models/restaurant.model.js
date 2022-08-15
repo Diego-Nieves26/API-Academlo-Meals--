@@ -1,36 +1,36 @@
-const { db, DataTypes } = require("../utils/database.util");
+const mongoose = require("mongoose");
 
-const Restaurant = db.define(
-  "restaurant",
+const restaurantSchema = new mongoose.Schema(
   {
-    id: {
-      primaryKey: true,
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      allowNull: false,
-    },
     name: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: [true, "Please enter a valid name"],
     },
     address: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: [true, "Please enter a valid adress"],
     },
     rating: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      type: Number,
+      required: [true, "Please enter a valid rating"],
     },
     status: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "active",
+      type: String,
+      default: "active",
     },
   },
   {
-    tableName: "restaurant",
-    timestamps: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+restaurantSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "restaurantId",
+  localField: "_id",
+});
+
+const Restaurant = mongoose.model("Restaurant", restaurantSchema);
 
 module.exports = { Restaurant };

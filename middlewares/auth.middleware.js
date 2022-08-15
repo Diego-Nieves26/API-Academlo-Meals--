@@ -26,10 +26,9 @@ const protectSession = catchAsync(async (req, res, next) => {
 
   const decoded = await jwt.verify(token, process.env.JWT_SECRET);
 
-  const user = await User.findOne({
-    where: { id: decoded.id, status: "active" },
-  });
-  if (!user) {
+  const user = await User.findById(decoded.id);
+
+  if (!user || user.status !== "active") {
     return next(
       new AppError("The owner of this token doesnt exist anymore", 403)
     );
@@ -42,7 +41,7 @@ const protectSession = catchAsync(async (req, res, next) => {
 const protectUserAcoount = catchAsync(async (req, res, next) => {
   const { sessionUser, user } = req;
 
-  if (user.id !== sessionUser.id) {
+  if (!user._id.equals(sessionUser._id)) {
     return next(new AppError("You do not own this account", 403));
   }
 

@@ -7,11 +7,14 @@ const { catchAsync } = require("../utils/catchAsync.util");
 
 const orderExists = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-
-  const order = await Order.findOne({ where: { id, status: "active" } });
+  const order = await Order.findById(id);
 
   if (!order) {
     return next(new AppError("Order not found", 404));
+  }
+
+  if (order.status !== "active") {
+    return next(new AppError("The user is not active", 404));
   }
 
   req.order = order;
@@ -22,7 +25,7 @@ const verifyOrder = catchAsync(async (req, res, next) => {
   const { sessionUser } = req;
   const { order } = req;
 
-  if (sessionUser.id !== order.userId) {
+  if (!sessionUser._id.equals(order.userId)) {
     return next(new AppError("This is not your order", 404));
   }
 

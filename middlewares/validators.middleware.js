@@ -54,11 +54,7 @@ const createOrderValidator = [
     .withMessage("Quantity cannot be empty")
     .isInt()
     .withMessage("Quantity must be a integer number"),
-  body("mealId")
-    .notEmpty()
-    .withMessage("Meal ID cannot be empty")
-    .isInt()
-    .withMessage("Meal ID must be a integer number"),
+  body("mealId").notEmpty().withMessage("Meal ID cannot be empty"),
   checkResult,
 ];
 

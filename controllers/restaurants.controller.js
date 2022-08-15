@@ -21,14 +21,12 @@ const createRestaurant = catchAsync(async (req, res, next) => {
 });
 
 const getAllActiveRestaurants = catchAsync(async (req, res, next) => {
-  const restaurants = await Restaurant.findAll({
-    where: { status: "active" },
-    include: [
-      {
-        model: Review,
-        //where: { status: "active" },
-      },
-    ],
+  const restaurants = await Restaurant.find({
+    status: "active",
+  }).populate({
+    path: "reviews",
+    match: { status: "active" },
+    populate: { path: "userId", select: "-password" },
   });
 
   res.status(200).json({
@@ -51,6 +49,7 @@ const updateRestaurant = catchAsync(async (req, res, next) => {
   const { restaurant } = req;
 
   await restaurant.update({ name, address });
+
   res.status(204).json({ status: "success" });
 });
 
@@ -58,6 +57,7 @@ const disableRestaurant = catchAsync(async (req, res, next) => {
   const { restaurant } = req;
 
   await restaurant.update({ status: "disable" });
+
   res.status(204).json({ status: "success" });
 });
 

@@ -10,7 +10,7 @@ const { AppError } = require("../utils/appError.util");
 const createOrder = catchAsync(async (req, res, next) => {
   const { quantity, mealId } = req.body;
   const { sessionUser } = req;
-  const meal = await Meal.findOne({ where: { id: mealId } });
+  const meal = await Meal.findOne({ where: { id: mealId, status: "active" } });
 
   if (!meal) {
     return next(new AppError("Meal not found", 404));
@@ -31,14 +31,12 @@ const createOrder = catchAsync(async (req, res, next) => {
 
 const getAllOrders = catchAsync(async (req, res, next) => {
   const { sessionUser } = req;
-  const orders = await Order.findAll({
-    where: { userId: sessionUser.id },
-    include: [
-      {
-        model: Meal,
-        include: { model: Restaurant },
-      },
-    ],
+  const orders = await Order.find({ userId: sessionUser.id }).populate({
+    path: "mealId",
+    match: { status: "active" },
+    populate: {
+      path: "restaurantId",
+    },
   });
 
   res.status(200).json({

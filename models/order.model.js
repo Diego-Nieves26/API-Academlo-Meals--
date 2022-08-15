@@ -1,40 +1,34 @@
-const { db, DataTypes } = require("../utils/database.util");
+const mongoose = require("mongoose");
 
-const Order = db.define(
-  "order",
+const orderSchema = new mongoose.Schema(
   {
-    id: {
-      primaryKey: true,
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      allowNull: false,
-    },
     mealId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      ref: "Meal",
+      type: mongoose.Schema.ObjectId,
     },
     userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      ref: "User",
+      type: mongoose.Schema.ObjectId,
     },
     totalPrice: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      type: Number,
+      required: [true, "Please enter a valid total price"],
     },
     quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      type: Number,
+      required: [true, "Please enter a valid quantity"],
     },
     status: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "active",
+      type: String,
+      default: "active",
     },
   },
   {
-    tableName: "order",
-    timestamps: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+const Order = mongoose.model("Order", orderSchema);
 
 module.exports = { Order };

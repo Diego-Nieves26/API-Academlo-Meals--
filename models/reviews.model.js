@@ -1,40 +1,28 @@
-const { db, DataTypes } = require("../utils/database.util");
+const mongoose = require("mongoose");
 
-const Review = db.define(
-  "review",
-  {
-    id: {
-      primaryKey: true,
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      allowNull: false,
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    comment: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    restaurantId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    rating: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    status: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "active",
-    },
+const reviewSchema = new mongoose.Schema({
+  userId: {
+    ref: "User",
+    type: mongoose.Schema.ObjectId,
   },
-  {
-    tableName: "review",
-    timestamps: false,
-  }
-);
+  comment: {
+    type: String,
+    required: [true, "Please enter a valid comment"],
+  },
+  restaurantId: {
+    ref: "Restaurant",
+    type: mongoose.Schema.ObjectId,
+  },
+  rating: {
+    type: String,
+    required: [true, "Please enter a valid rating"],
+  },
+  status: {
+    type: String,
+    default: "active",
+  },
+});
+
+const Review = mongoose.model("Review", reviewSchema);
 
 module.exports = { Review };

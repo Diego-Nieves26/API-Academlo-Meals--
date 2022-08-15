@@ -5,8 +5,6 @@ const dotenv = require("dotenv");
 // Models
 const { User } = require("../models/user.model");
 const { Order } = require("../models/order.model");
-const { Restaurant } = require("../models/restaurant.model");
-const { Meal } = require("../models/meal.model");
 
 // Utils
 const { catchAsync } = require("../utils/catchAsync.util");
@@ -16,6 +14,12 @@ dotenv.config({ path: "./config.env" });
 
 const createUser = catchAsync(async (req, res, next) => {
   const { username, email, password, role } = req.body;
+
+  const userExist = await User.findOne({ email });
+
+  if (userExist) {
+    return next(new AppError("Email already taken", 400));
+  }
 
   const salt = await bcrypt.genSalt(12);
   const hashPassword = await bcrypt.hash(password, salt);
@@ -29,6 +33,7 @@ const createUser = catchAsync(async (req, res, next) => {
 
   newUser.password = undefined;
 
+  console.log(newUser);
   res.status(201).json({
     status: "success",
     newUser,
@@ -38,7 +43,7 @@ const createUser = catchAsync(async (req, res, next) => {
 const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ where: { email, status: "active" } });
+  const user = await User.findOne({ email, status: "active" });
 
   if (!user) {
     return next(new AppError("Credentials invalid", 404));
@@ -80,9 +85,12 @@ const deleteUser = catchAsync(async (req, res, next) => {
 const getAllOrders = catchAsync(async (req, res, next) => {
   const { sessionUser } = req;
 
-  const orders = await Order.findAll({
-    where: { userId: sessionUser.id },
-    include: [{ model: Meal, include: { model: Restaurant } }],
+  const orders = await Order.find({ userId: sessionUser.id }).populate({
+    path: "mealId",
+    match: { status: "active" },
+    populate: {
+      path: "restaurantId",
+    },
   });
 
   res.status(200).json({
@@ -96,8 +104,14 @@ const getOrderById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
 
   const order = await Order.findOne({
-    where: { id, userId: sessionUser.id },
-    include: [{ model: Meal, include: { model: Restaurant } }],
+    id,
+    userId: sessionUser.id,
+  }).populate({
+    path: "mealId",
+    match: { status: "active" },
+    populate: {
+      path: "restaurantId",
+    },
   });
 
   if (!order) {
